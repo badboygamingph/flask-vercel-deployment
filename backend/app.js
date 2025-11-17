@@ -33,9 +33,6 @@ app.use('/', accountRoutes);
 
 // Export the app for Vercel
 module.exports = app;
-module.exports.default = (req, res) => {
-    return app(req, res);
-};
 
 // Only start the server if this file is run directly
 if (require.main === module) {
