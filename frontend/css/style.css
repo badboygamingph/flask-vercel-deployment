@@ -1,0 +1,1197 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body{
+    background-color: #c9d6ff;
+    background: linear-gradient(to right, #e2e2e2, #c9d6ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.container{
+    background-color: #fff;
+    border-radius: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+    position: relative;
+    overflow: hidden;
+    width: 768px;
+    max-width: 100%;
+    min-height: 480px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "forms toggle";
+}
+
+.container h1{
+    font-size: 2.2rem;
+    font-weight: 600;
+}
+
+.container p{
+    font-size: 1rem;
+    line-height: 1.6;
+    letter-spacing: 0.5px;
+    margin: 20px 0;
+}
+
+.container span{
+    font-size: 12px;
+}
+
+.container a{
+    color: #333;
+    font-size: 13px;
+    text-decoration: none;
+    margin: 15px 0 10px;
+}
+
+.container button{
+    background-color: #512da8;
+    color: #fff;
+    font-size: 12px;
+    padding: 10px 45px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.container button.hidden{
+    background-color: transparent;
+    border-color: #fff;
+}
+
+.container form h1{
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.container form{
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 40px;
+    height: 100%;
+}
+
+.container input{
+    background-color: #eee;
+    border: none;
+    margin: 8px 0;
+    padding: 10px 15px;
+    font-size: 13px;
+    border-radius: 8px;
+    width: 100%;
+    outline: none;
+}
+
+.form-container{
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: all 0.6s ease-in-out;
+}
+
+.sign-in{
+    left: 0;
+    width: 50%;
+    z-index: 2;
+}
+
+.container.active .sign-in{
+    transform: translateX(100%);
+}
+
+.sign-up{
+    left: 0;
+    width: 50%;
+    opacity: 0;
+    z-index: 1;
+}
+
+.container.active .sign-up{
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+    animation: move 0.6s;
+}
+
+@keyframes move{
+    0%, 49.99%{
+        opacity: 0;
+        z-index: 1;
+    }
+    50%, 100%{
+        opacity: 1;
+        z-index: 5;
+    }
+}
+
+.social-icons{
+    margin: 20px 0;
+}
+
+.social-icons a{
+    border: 1px solid #ccc;
+    border-radius: 20%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 3px;
+    width: 40px;
+    height: 40px;
+}
+
+.toggle-container{
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: all 0.6s ease-in-out;
+    border-radius: 150px 0 0 100px;
+    z-index: 1000;
+}
+
+.container.active .toggle-container{
+    transform: translateX(-100%);
+    border-radius: 0 150px 100px 0;
+}
+
+.toggle{
+    background-color: #512da8;
+    height: 100%;
+    background: linear-gradient(to right, #5c6bc0, #512da8);
+    color: #fff;
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: all 0.6s ease-in-out;
+}
+
+.container.active .toggle{
+    transform: translateX(50%);
+}
+
+.toggle-panel{
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 30px;
+    text-align: center;
+    top: 0;
+    transform: translateX(0);
+    transition: all 0.6s ease-in-out;
+}
+
+.toggle-left{
+    transform: translateX(-200%);
+}
+
+.container.active .toggle-left{
+    transform: translateX(0);
+}
+
+.toggle-right{
+    right: 0;
+    transform: translateX(0);
+}
+
+.container.active .toggle-right{
+    transform: translateX(200%);
+}
+
+.name-group {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.name-group input {
+    width: 100%;
+}
+
+.password-strength {
+    height: 10px;
+    width: 100%;
+    background: #eee;
+    border-radius: 5px;
+    margin-top: -5px;
+    margin-bottom: 10px;
+}
+
+.strength-bar {
+    height: 100%;
+    width: 0;
+    background: #f00;
+    border-radius: 5px;
+    transition: width 0.3s, background 0.3s;
+}
+
+.strength-text {
+    font-size: 12px;
+    margin-top: 5px;
+    text-align: right;
+    display: block;
+}
+
+.toastify {
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    border-left: 5px solid;
+    font-family: 'Poppins', sans-serif;
+    min-width: 300px;
+    max-width: 400px;
+    z-index: 10000;
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+}
+
+button .spinner-border {
+    margin-left: 5px;
+}
+
+.toastify.toastify-success {
+    border-left-color: #4CAF50; 
+    background: #fff;
+    color: #000;
+}
+
+.toastify.toastify-error {
+    border-left-color: #F44336; 
+    background: #fff;
+    color: #000;
+}
+
+.toastify.toastify-warning {
+    border-left-color: #FFC107; 
+    background: #fff;
+    color: #000;
+}
+
+.toastify.toastify-info {
+    border-left-color: #2196F3; 
+    background: #fff;
+    color: #000;
+}
+
+/* Toast Progress Bar Styling */
+.toast-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.toast-progress-fill {
+    height: 100%;
+    background: #808080;
+    width: 100%;
+    transition: width linear;
+    box-shadow: 0 0 8px rgba(128,128,128,0.4);
+}
+
+.toastify-warning .toast-progress-bar {
+    background: rgba(0,0,0,0.15);
+}
+
+.toastify-warning .toast-progress-fill {
+    background: #808080;
+    box-shadow: 0 0 8px rgba(128,128,128,0.4);
+}
+
+.toastify-success .toast-progress-bar {
+    background: rgba(0,0,0,0.15);
+}
+
+.toastify-success .toast-progress-fill {
+    background: #808080;
+    box-shadow: 0 0 8px rgba(128,128,128,0.4);
+}
+
+.toastify-error .toast-progress-bar {
+    background: rgba(0,0,0,0.15);
+}
+
+.toastify-error .toast-progress-fill {
+    background: #808080;
+    box-shadow: 0 0 8px rgba(128,128,128,0.4);
+}
+
+.toastify-info .toast-progress-bar {
+    background: rgba(0,0,0,0.15);
+}
+
+.toastify-info .toast-progress-fill {
+    background: #808080;
+    box-shadow: 0 0 8px rgba(128,128,128,0.4);
+}
+
+/* Toast hover effect */
+.toastify:hover {
+    box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+.otp-fields {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+    width: 100%;
+}
+
+.otp-input-field {
+    width: 40px; 
+    height: 40px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #eee;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.otp-input-field:focus {
+    border-color: #512da8;
+    box-shadow: 0 0 0 3px rgba(81, 45, 168, 0.2);
+}
+
+/* Single OTP Input Field Styling */
+.otp-single-field {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    width: 100%;
+}
+
+.otp-input-single {
+    width: 100%;
+    max-width: 300px;
+    height: 50px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    letter-spacing: 8px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    background-color: #f8f9fa;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s;
+    padding: 0 15px;
+}
+
+.otp-input-single:focus {
+    border-color: #512da8;
+    box-shadow: 0 0 0 4px rgba(81, 45, 168, 0.15);
+    background-color: #fff;
+}
+
+.otp-input-single::placeholder {
+    font-size: 14px;
+    letter-spacing: normal;
+    font-weight: normal;
+    color: #999;
+}
+
+.otp-countdown {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.forgot-otp-input-field {
+    width: 40px; 
+    height: 40px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #eee;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.forgot-otp-input-field:focus {
+    border-color: #512da8;
+    box-shadow: 0 0 0 3px rgba(81, 45, 168, 0.2);
+}
+
+#resendOtpButton {
+    background-color: transparent;
+    border: 1px solid #512da8;
+    color: #512da8;
+    padding: 8px 20px;
+    font-size: 11px;
+    margin-top: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#resendOtpButton:hover {
+    background-color: #512da8;
+    color: #fff;
+}
+
+#resendOtpButton:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    border-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.toastify.toastify-error {
+    border-left-color: #F44336;
+    background: #fff;
+    color: #000;
+}
+
+.btn-link, .btn-secondary {
+    text-decoration: none !important;
+}
+
+.breadcrumb {
+    background-color: #f8f9fa;
+    padding: 8px 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.breadcrumb-item {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.breadcrumb-item.active {
+    font-weight: bold;
+    color: #512da8; 
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: ">"; 
+    color: #6c757d;
+    padding: 0 8px;
+}
+
+.modal-header .btn-close {
+background-color: transparent;
+color: #000; 
+opacity: 1; 
+}
+
+.modal-header .btn-close:hover {
+opacity: 0.75; 
+}
+
+/* Base Modal Styling for Better Mobile Support */
+.modal-dialog {
+display: flex;
+align-items: center;
+min-height: calc(100% - 1rem);
+}
+
+.modal-content {
+width: 100%;
+}
+
+.modal-body form {
+width: 100%;
+}
+
+/* Fix for aria-hidden focus issue */
+.modal[aria-hidden="true"] {
+    display: none !important;
+}
+
+.modal.fade[aria-hidden="true"] {
+    opacity: 0;
+    pointer-events: none;
+}
+
+body:focus {
+    outline: none;
+}
+
+.modal-backdrop:focus {
+    outline: none;
+}
+
+/* customizable snowflake styling */
+.snowflake {
+color: #fff;
+font-size: 1em;
+font-family: Arial, sans-serif;
+text-shadow: 0 0 5px #000;
+  font-size: 1em;
+  font-family: Arial, sans-serif;
+  text-shadow: 0 0 5px #000;
+}
+ 
+.snowflake,.snowflake .inner{animation-iteration-count:infinite;animation-play-state:running}@keyframes snowflakes-fall{0%{transform:translateY(0)}100%{transform:translateY(110vh)}}@keyframes snowflakes-shake{0%,100%{transform:translateX(0)}50%{transform:translateX(80px)}}.snowflake{position:fixed;top:-10%;z-index:9999;-webkit-user-select:none;user-select:none;cursor:default;pointer-events:none;animation-name:snowflakes-shake;animation-duration:3s;animation-timing-function:ease-in-out}.snowflake .inner{animation-duration:10s;animation-name:snowflakes-fall;animation-timing-function:linear}.snowflake:nth-of-type(0){left:1%;animation-delay:0s}.snowflake:nth-of-type(0) .inner{animation-delay:0s}.snowflake:first-of-type{left:10%;animation-delay:1s}.snowflake:first-of-type .inner,.snowflake:nth-of-type(8) .inner{animation-delay:1s}.snowflake:nth-of-type(2){left:20%;animation-delay:.5s}.snowflake:nth-of-type(2) .inner,.snowflake:nth-of-type(6) .inner{animation-delay:6s}.snowflake:nth-of-type(3){left:30%;animation-delay:2s}.snowflake:nth-of-type(11) .inner,.snowflake:nth-of-type(3) .inner{animation-delay:4s}.snowflake:nth-of-type(4){left:40%;animation-delay:2s}.snowflake:nth-of-type(10) .inner,.snowflake:nth-of-type(4) .inner{animation-delay:2s}.snowflake:nth-of-type(5){left:50%;animation-delay:3s}.snowflake:nth-of-type(5) .inner{animation-delay:8s}.snowflake:nth-of-type(6){left:60%;animation-delay:2s}.snowflake:nth-of-type(7){left:70%;animation-delay:1s}.snowflake:nth-of-type(7) .inner{animation-delay:2.5s}.snowflake:nth-of-type(8){left:80%;animation-delay:0s}.snowflake:nth-of-type(9){left:90%;animation-delay:1.5s}.snowflake:nth-of-type(9) .inner{animation-delay:3s}.snowflake:nth-of-type(10){left:25%;animation-delay:0s}.snowflake:nth-of-type(11){left:65%;animation-delay:2.5s}
+
+/* ===== RESPONSIVE DESIGN - MOBILE FIRST ===== */
+
+/* Tablet and smaller screens */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 10px;
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    /* Toast mobile styling */
+    .toastify {
+        min-width: 280px;
+        max-width: calc(100% - 40px);
+        top: 20px !important;
+        right: 20px !important;
+        left: auto !important;
+    }
+    
+    /* Breadcrumb mobile styling */
+    .breadcrumb {
+        padding: 6px 12px;
+        margin-bottom: 15px;
+        font-size: 13px;
+    }
+    
+    .breadcrumb-item {
+        font-size: 13px;
+    }
+    
+    .breadcrumb-item + .breadcrumb-item::before {
+        padding: 0 6px;
+        font-size: 12px;
+    }
+    
+    .container {
+        width: 100%;
+        max-width: 100%;
+        min-height: 600px;
+        border-radius: 20px;
+        margin: 10px;
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+            "forms"
+            "toggle";
+        grid-template-rows: auto auto;
+    }
+    
+    /* OTP Modal Responsive Styling */
+    .modal-dialog {
+        margin: 10px;
+        max-width: calc(100% - 20px);
+    }
+    
+    .modal-content {
+        border-radius: 15px;
+    }
+    
+    .modal-header {
+        padding: 15px 20px;
+    }
+    
+    .modal-title {
+        font-size: 1.3rem;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .modal-body p {
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+    
+    .otp-fields {
+        gap: 8px;
+        margin: 15px 0;
+    }
+    
+    .otp-input-field,
+    .forgot-otp-input-field {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+    
+    /* Single OTP Input - Tablet */
+    .otp-single-field {
+        margin: 15px 0;
+    }
+    
+    .otp-input-single {
+        max-width: 280px;
+        height: 48px;
+        font-size: 22px;
+        letter-spacing: 6px;
+    }
+    
+    .otp-countdown {
+        font-size: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .modal-body .btn {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+    
+    #resendOtpButton,
+    #forgotResendOtpButton {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+    
+    .container h1 {
+        font-size: 1.8rem;
+    }
+    
+    .container p {
+        font-size: 0.9rem;
+        margin: 15px 0;
+    }
+    
+    .container form {
+        padding: 20px 30px;
+    }
+    
+    .form-container {
+        position: relative;
+        width: 100% !important;
+        left: 0 !important;
+        transform: none !important;
+        z-index: 1 !important;
+    }
+    
+    /* Mobile: Show only sign-in form initially */
+    .sign-in {
+        position: relative;
+        width: 100%;
+        left: 0;
+        opacity: 1;
+        z-index: 2;
+        transform: none;
+        display: block;
+    }
+    
+    .sign-up {
+        position: relative;
+        width: 100%;
+        left: 0;
+        opacity: 0;
+        z-index: 1;
+        transform: none;
+        display: none;
+    }
+    
+    /* When container is active, show sign-up and hide sign-in */
+    .container.active .sign-in {
+        opacity: 0;
+        z-index: 1;
+        display: none;
+    }
+    
+    .container.active .sign-up {
+        opacity: 1;
+        z-index: 2;
+        display: block;
+    }
+    
+    .toggle-container {
+        position: relative;
+        left: 0;
+        width: 100%;
+        height: auto;
+        min-height: 200px;
+        border-radius: 0 0 20px 20px;
+        transform: none !important;
+    }
+    
+    .container.active .toggle-container {
+        transform: none;
+        border-radius: 0 0 20px 20px;
+    }
+    
+    .toggle {
+        position: relative;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: none !important;
+    }
+    
+    .container.active .toggle {
+        transform: none;
+    }
+    
+    .toggle-panel {
+        position: relative;
+        width: 100%;
+        padding: 30px;
+        transform: none !important;
+    }
+    
+    .toggle-left, .toggle-right {
+        position: relative;
+        right: auto;
+        transform: none !important;
+    }
+    
+    .container.active .toggle-left,
+    .container.active .toggle-right {
+        transform: none;
+    }
+    
+    /* Mobile toggle panel visibility */
+    .toggle-left {
+        display: none;
+    }
+    
+    .toggle-right {
+        display: block;
+    }
+    
+    .container.active .toggle-left {
+        display: block;
+    }
+    
+    .container.active .toggle-right {
+        display: none;
+    }
+}
+
+/* Mobile phones */
+@media screen and (max-width: 480px) {
+    body {
+        padding: 5px;
+    }
+    
+    /* Toast extra mobile styling */
+    .toastify {
+        min-width: 260px;
+        max-width: calc(100% - 20px);
+        top: 10px !important;
+        right: 10px !important;
+        font-size: 13px;
+    }
+    
+    .toast-progress-bar {
+        height: 5px;
+    }
+    
+    .toast-progress-fill {
+        box-shadow: 0 0 8px rgba(255,255,255,0.4);
+    }
+    
+    /* Breadcrumb extra mobile styling */
+    .breadcrumb {
+        padding: 5px 10px;
+        margin-bottom: 12px;
+        font-size: 12px;
+        gap: 4px;
+    }
+    
+    .breadcrumb-item {
+        font-size: 12px;
+        white-space: nowrap;
+    }
+    
+    .breadcrumb-item + .breadcrumb-item::before {
+        padding: 0 4px;
+        font-size: 11px;
+    }
+    
+    .container {
+        margin: 5px;
+        border-radius: 15px;
+        min-height: 550px;
+    }
+    
+    .container h1 {
+        font-size: 1.5rem;
+    }
+    
+    .container form h1 {
+        font-size: 1.6rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .container p {
+        font-size: 0.85rem;
+        margin: 10px 0;
+    }
+    
+    .container form {
+        padding: 15px 20px;
+    }
+    
+    .container input {
+        padding: 12px 15px;
+        font-size: 14px;
+        margin: 6px 0;
+    }
+    
+    .container button {
+        padding: 12px 35px;
+        font-size: 11px;
+    }
+    
+    .name-group {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .name-group input {
+        margin: 4px 0;
+    }
+    
+    /* OTP Modal Mobile Styling */
+    .modal-dialog {
+        margin: 5px;
+        max-width: calc(100% - 10px);
+    }
+    
+    .modal-content {
+        border-radius: 12px;
+    }
+    
+    .modal-header {
+        padding: 12px 15px;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .modal-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+    
+    .modal-body {
+        padding: 15px;
+    }
+    
+    .modal-body p {
+        font-size: 0.85rem;
+        line-height: 1.5;
+        margin-bottom: 12px;
+        text-align: center;
+    }
+    
+    .otp-fields {
+        gap: 6px;
+        flex-wrap: nowrap;
+        justify-content: center;
+        margin: 15px auto;
+        max-width: 100%;
+    }
+    
+    .otp-input-field,
+    .forgot-otp-input-field {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+        border-radius: 8px;
+        flex-shrink: 0;
+    }
+    
+    /* Single OTP Input - Mobile */
+    .otp-single-field {
+        margin: 15px auto;
+        padding: 0 10px;
+    }
+    
+    .otp-input-single {
+        max-width: 100%;
+        width: calc(100% - 20px);
+        height: 50px;
+        font-size: 20px;
+        letter-spacing: 5px;
+        border-radius: 10px;
+        padding: 0 10px;
+    }
+    
+    .otp-input-single::placeholder {
+        font-size: 13px;
+    }
+    
+    .otp-countdown {
+        font-size: 14px;
+        text-align: center;
+        margin-bottom: 12px;
+        color: #512da8;
+    }
+    
+    .modal-body .btn {
+        padding: 12px 20px;
+        font-size: 13px;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+    
+    .modal-body .btn-primary {
+        background-color: #512da8;
+        border-color: #512da8;
+    }
+    
+    .modal-body .btn-secondary {
+        margin-top: 10px;
+    }
+    
+    #resendOtpButton,
+    #forgotResendOtpButton {
+        padding: 8px 15px;
+        font-size: 12px;
+        margin-top: 8px;
+    }
+    
+    .btn-close {
+        padding: 8px;
+        font-size: 1rem;
+    }
+    
+    .toggle-panel {
+        padding: 20px 15px;
+    }
+    
+    .toggle-panel h1 {
+        font-size: 1.4rem;
+    }
+    
+    .toggle-panel p {
+        font-size: 0.8rem;
+    }
+    
+    /* Ensure proper form visibility on mobile phones */
+    .sign-in {
+        display: block !important;
+        opacity: 1 !important;
+    }
+    
+    .sign-up {
+        display: none !important;
+        opacity: 0 !important;
+    }
+    
+    .container.active .sign-in {
+        display: none !important;
+        opacity: 0 !important;
+    }
+    
+    .container.active .sign-up {
+        display: block !important;
+        opacity: 1 !important;
+    }
+}
+
+/* Extra small screens */
+@media screen and (max-width: 360px) {
+    .container {
+        margin: 2px;
+        border-radius: 10px;
+    }
+    
+    .container form {
+        padding: 10px 15px;
+    }
+    
+    .container input {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    
+    .container button {
+        padding: 10px 25px;
+        font-size: 10px;
+    }
+    
+    /* Breadcrumb extra small screens */
+    .breadcrumb {
+        padding: 4px 8px;
+        margin-bottom: 10px;
+        font-size: 11px;
+        gap: 2px;
+    }
+    
+    .breadcrumb-item {
+        font-size: 11px;
+    }
+    
+    .breadcrumb-item + .breadcrumb-item::before {
+        padding: 0 3px;
+        font-size: 10px;
+    }
+    
+    /* OTP Modal Extra Small Screens */
+    .modal-dialog {
+        margin: 3px;
+        max-width: calc(100% - 6px);
+    }
+    
+    .modal-content {
+        border-radius: 10px;
+    }
+    
+    .modal-header {
+        padding: 10px 12px;
+    }
+    
+    .modal-title {
+        font-size: 1.1rem;
+    }
+    
+    .modal-body {
+        padding: 12px;
+    }
+    
+    .modal-body p {
+        font-size: 0.8rem;
+        margin-bottom: 10px;
+    }
+    
+    .otp-fields {
+        gap: 4px;
+        margin: 12px auto;
+    }
+    
+    .otp-input-field,
+    .forgot-otp-input-field {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+        border-radius: 6px;
+    }
+    
+    /* Single OTP Input - Extra Small */
+    .otp-single-field {
+        margin: 12px auto;
+        padding: 0 5px;
+    }
+    
+    .otp-input-single {
+        max-width: 100%;
+        width: calc(100% - 10px);
+        height: 48px;
+        font-size: 18px;
+        letter-spacing: 4px;
+        border-radius: 8px;
+        padding: 0 8px;
+    }
+    
+    .otp-input-single::placeholder {
+        font-size: 12px;
+    }
+    
+    .otp-countdown {
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+    
+    .modal-body .btn {
+        padding: 10px 15px;
+        font-size: 12px;
+    }
+    
+    #resendOtpButton,
+    #forgotResendOtpButton {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+    
+    .toggle-panel {
+        padding: 15px 10px;
+    }
+    
+    /* Maintain form visibility on extra small screens */
+    .sign-in {
+        display: block !important;
+        opacity: 1 !important;
+    }
+    
+    .sign-up {
+        display: none !important;
+        opacity: 0 !important;
+    }
+    
+    .container.active .sign-in {
+        display: none !important;
+        opacity: 0 !important;
+    }
+    
+    .container.active .sign-up {
+        display: block !important;
+        opacity: 1 !important;
+    }
+}
+
+/* Landscape orientation for mobile */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    body {
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .container {
+        min-height: 400px;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "forms toggle";
+        grid-template-rows: 1fr;
+    }
+    
+    .toggle-container {
+        position: absolute;
+        left: 50%;
+        width: 50%;
+        height: 100%;
+        border-radius: 150px 0 0 100px;
+    }
+    
+    .form-container {
+        position: absolute;
+        width: 50%;
+    }
+    
+    .sign-in, .sign-up {
+        width: 50%;
+    }
+    
+    .toggle-left {
+        display: block;
+    }
+    
+    .container.active .toggle-right {
+        display: block;
+    }
+}
