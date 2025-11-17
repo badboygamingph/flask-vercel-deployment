@@ -104,7 +104,8 @@ exports.updateAccount = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Error updating account.' });
     }
 
-    if (data === null) {
+    // Check if no rows were affected (account not found or not owned by user)
+    if (data && data.length === 0) {
         if (req.file) {
             fs.unlink(req.file.path, (unlinkErr) => {
                 if (unlinkErr) console.error('Error deleting uploaded file:', unlinkErr);
@@ -131,7 +132,8 @@ exports.deleteAccount = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Error deleting account.' });
     }
 
-    if (data === null) {
+    // Check if no rows were affected (account not found or not owned by user)
+    if (data && data.length === 0) {
         return res.status(404).json({ success: false, message: 'Account not found or you do not have permission to delete it.' });
     }
 
