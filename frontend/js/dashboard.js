@@ -263,14 +263,16 @@ $(document).ready(function() {
             {
                 data: 'image',
                 render: function(data, type, row) {
-                    return `<img src="${data || 'images/default.png'}" alt="Account Image" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">`;
+                    // Use BASE_URL for default images to avoid mixed content issues
+                    const imageUrl = data || `${BASE_URL}/images/default.png`;
+                    return `<img src="${imageUrl}" alt="Account Image" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">`;
                 }
             },
             {
                 data: null,
                 render: function(data, type, row) {
                     return `
-                        <button class="btn btn-sm btn-info edit-btn" data-id="${row.id}" data-site="${row.site}" data-username="${row.username}" data-password="${row.password}" data-image="${row.image || 'images/default.png'}" data-bs-toggle="modal" data-bs-target="#editAccountModal">Edit</button>
+                        <button class="btn btn-sm btn-info edit-btn" data-id="${row.id}" data-site="${row.site}" data-username="${row.username}" data-password="${row.password}" data-image="${row.image || `${BASE_URL}/images/default.png`}" data-bs-toggle="modal" data-bs-target="#editAccountModal">Edit</button>
                         <button class="btn btn-sm btn-danger delete-btn" data-id="${row.id}" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Delete</button>
                     `;
                 }
@@ -307,7 +309,7 @@ $(document).ready(function() {
         if (imageFile) {
             formData.append('image', imageFile);
         } else {
-            formData.append('image', 'images/default.png'); 
+            formData.append('image', `${BASE_URL}/images/default.png`); 
         }
 
         const data = await fetchData(`${BASE_URL}/accounts`, 'POST', formData, true);
@@ -489,7 +491,7 @@ $(document).ready(function() {
         const data = await fetchData(`${BASE_URL}/upload-profile-picture`, 'POST', formData, true);
         if (data && data.success) {
             showToast('Profile picture updated successfully!', 'success');
-            $('.navbar-nav .avatar').attr('src', data.profilepicture);
+            $('#userProfilePicture').attr('src', data.profilepicture);
             $('#changeProfilePictureForm')[0].reset();
         } else if (data) {
             showToast(data.message, 'error');
@@ -499,9 +501,9 @@ $(document).ready(function() {
     const loadUserProfilePicture = async () => {
         const data = await fetchData(`${BASE_URL}/profile-picture`);
         if (data && data.success && data.profilepicture) {
-            $('.navbar-nav .avatar').attr('src', data.profilepicture);
+            $('#userProfilePicture').attr('src', data.profilepicture);
         } else {
-            $('.navbar-nav .avatar').attr('src', 'images/default-profile.png');
+            $('#userProfilePicture').attr('src', 'images/default-profile.png');
         }
     };
     loadUserProfilePicture();
