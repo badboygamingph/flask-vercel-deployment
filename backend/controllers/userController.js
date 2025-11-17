@@ -129,7 +129,7 @@ exports.getProfilePicture = async (req, res) => {
             // This is a temporary file that needs to be moved
             const filename = profilepicture.replace('images/', '');
             const tmpPath = `/tmp/${filename}`;
-            const targetPath = `./frontend/images/${filename}`;
+            // targetPath will be set later with proper path resolution
             
             // Check if the file exists in /tmp and move it
             if (fs.existsSync(tmpPath)) {
@@ -141,6 +141,7 @@ exports.getProfilePicture = async (req, res) => {
                     }
                     
                     // Move the file from /tmp to images directory
+                    const targetPath = path.join(__dirname, '../../frontend/images', filename);
                     fs.renameSync(tmpPath, targetPath);
                     console.log(`Moved profile picture from ${tmpPath} to ${targetPath}`);
                     
