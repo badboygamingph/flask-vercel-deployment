@@ -16,7 +16,8 @@ exports.createAccount = async (req, res) => {
     if (req.file) {
         // Upload file to Supabase Storage
         try {
-            const fileBuffer = fs.readFileSync(req.file.path || path.join(__dirname, '../../frontend/images', req.file.filename));
+            // Read the file buffer directly from the uploaded file
+            const fileBuffer = req.file.buffer || fs.readFileSync(req.file.path);
             const fileName = `accounts/${req.file.filename}`;
             
             const { publicUrl, error } = await uploadFileToSupabase(fileBuffer, fileName);
@@ -31,9 +32,8 @@ exports.createAccount = async (req, res) => {
             
             // Clean up local file if it exists
             try {
-                const localFilePath = req.file.path || path.join(__dirname, '../../frontend/images', req.file.filename);
-                if (fs.existsSync(localFilePath)) {
-                    fs.unlinkSync(localFilePath);
+                if (req.file.path && fs.existsSync(req.file.path)) {
+                    fs.unlinkSync(req.file.path);
                 }
             } catch (cleanupError) {
                 console.error('Error cleaning up local file:', cleanupError);
@@ -122,7 +122,8 @@ exports.updateAccount = async (req, res) => {
     if (req.file) {
         // Upload new file to Supabase Storage
         try {
-            const fileBuffer = fs.readFileSync(req.file.path || path.join(__dirname, '../../frontend/images', req.file.filename));
+            // Read the file buffer directly from the uploaded file
+            const fileBuffer = req.file.buffer || fs.readFileSync(req.file.path);
             const fileName = `accounts/${req.file.filename}`;
             
             // If there was a previous image, try to delete it from Supabase Storage
@@ -145,9 +146,8 @@ exports.updateAccount = async (req, res) => {
             
             // Clean up local file if it exists
             try {
-                const localFilePath = req.file.path || path.join(__dirname, '../../frontend/images', req.file.filename);
-                if (fs.existsSync(localFilePath)) {
-                    fs.unlinkSync(localFilePath);
+                if (req.file.path && fs.existsSync(req.file.path)) {
+                    fs.unlinkSync(req.file.path);
                 }
             } catch (cleanupError) {
                 console.error('Error cleaning up local file:', cleanupError);

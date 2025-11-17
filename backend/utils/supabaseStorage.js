@@ -9,6 +9,8 @@ const supabase = require('../db');
  */
 async function uploadFileToSupabase(fileBuffer, fileName, bucketName = 'images') {
   try {
+    console.log(`Uploading file to Supabase Storage: ${fileName} in bucket: ${bucketName}`);
+    
     // Upload the file to Supabase Storage
     const { data, error } = await supabase.storage
       .from(bucketName)
@@ -22,11 +24,14 @@ async function uploadFileToSupabase(fileBuffer, fileName, bucketName = 'images')
       return { publicUrl: null, error };
     }
 
+    console.log('File uploaded successfully:', data);
+
     // Get the public URL for the uploaded file
     const { data: { publicUrl } } = supabase.storage
       .from(bucketName)
       .getPublicUrl(fileName);
 
+    console.log('Public URL generated:', publicUrl);
     return { publicUrl, error: null };
   } catch (err) {
     console.error('Unexpected error uploading file to Supabase Storage:', err);
@@ -42,6 +47,8 @@ async function uploadFileToSupabase(fileBuffer, fileName, bucketName = 'images')
  */
 async function deleteFileFromSupabase(fileName, bucketName = 'images') {
   try {
+    console.log(`Deleting file from Supabase Storage: ${fileName} in bucket: ${bucketName}`);
+    
     const { error } = await supabase.storage
       .from(bucketName)
       .remove([fileName]);
@@ -51,6 +58,7 @@ async function deleteFileFromSupabase(fileName, bucketName = 'images') {
       return { error };
     }
 
+    console.log('File deleted successfully');
     return { error: null };
   } catch (err) {
     console.error('Unexpected error deleting file from Supabase Storage:', err);
@@ -66,10 +74,13 @@ async function deleteFileFromSupabase(fileName, bucketName = 'images') {
  */
 function getPublicUrlFromSupabase(fileName, bucketName = 'images') {
   try {
+    console.log(`Getting public URL for file: ${fileName} in bucket: ${bucketName}`);
+    
     const { data } = supabase.storage
       .from(bucketName)
       .getPublicUrl(fileName);
     
+    console.log('Public URL retrieved:', data.publicUrl);
     return data.publicUrl;
   } catch (err) {
     console.error('Error getting public URL from Supabase Storage:', err);

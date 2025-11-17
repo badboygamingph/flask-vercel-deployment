@@ -29,6 +29,44 @@ Supabase Setup Instructions
    - Click "RUN" to execute the script
    - This will create all three tables (users, accounts, otps) with proper relationships
 
+4. Set Up Supabase Storage:
+   - Manually create the bucket in the Supabase dashboard:
+     * Go to "Storage" in the left sidebar
+     * Click "New bucket"
+     * Name it "images"
+     * Set it to "Public"
+     * Click "Create"
+   - Create folders in the bucket:
+     * Click on the "images" bucket
+     * Click "Create folder"
+     * Create a folder named "accounts"
+     * Create another folder named "profile-pictures"
+   - Set up row-level security policies:
+     * Go to "SQL Editor" in the left sidebar
+     * Run the following SQL commands:
+       ```sql
+       -- Allow public read access to images bucket
+       INSERT INTO storage.buckets (id, name, public) 
+       VALUES ('images', 'images', true) 
+       ON CONFLICT (id) DO UPDATE SET public = true;
+       
+       -- Allow authenticated users to upload and delete files
+       CREATE POLICY "Allow authenticated uploads" 
+       ON storage.objects FOR INSERT 
+       TO authenticated 
+       WITH CHECK (bucket_id = 'images');
+       
+       CREATE POLICY "Allow authenticated deletes" 
+       ON storage.objects FOR DELETE 
+       TO authenticated 
+       USING (bucket_id = 'images');
+       
+       CREATE POLICY "Allow public reads" 
+       ON storage.objects FOR SELECT 
+       TO public 
+       USING (bucket_id = 'images');
+       ```
+
 5. Redeploy Your Application:
    - After setting environment variables in Vercel, you need to redeploy your application
    - Go to your Vercel dashboard

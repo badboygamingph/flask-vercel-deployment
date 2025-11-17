@@ -71,7 +71,8 @@ exports.uploadProfilePicture = async (req, res) => {
     
     // Upload file to Supabase Storage
     try {
-        const fileBuffer = fs.readFileSync(req.file.path || path.join(__dirname, '../../frontend/images', req.file.filename));
+        // Read the file buffer directly from the uploaded file
+        const fileBuffer = req.file.buffer || fs.readFileSync(req.file.path);
         const fileName = `profile-pictures/${req.file.filename}`;
         
         const { publicUrl, error } = await uploadFileToSupabase(fileBuffer, fileName);
@@ -86,9 +87,8 @@ exports.uploadProfilePicture = async (req, res) => {
         
         // Clean up local file if it exists
         try {
-            const localFilePath = req.file.path || path.join(__dirname, '../../frontend/images', req.file.filename);
-            if (fs.existsSync(localFilePath)) {
-                fs.unlinkSync(localFilePath);
+            if (req.file.path && fs.existsSync(req.file.path)) {
+                fs.unlinkSync(req.file.path);
             }
         } catch (cleanupError) {
             console.error('Error cleaning up local file:', cleanupError);
