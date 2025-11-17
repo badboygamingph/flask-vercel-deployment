@@ -13,6 +13,7 @@ exports.createAccount = async (req, res) => {
     }
 
     let imagePath = 'images/default.png';
+    // Check if a file was uploaded
     if (req.file) {
         // Upload file to Supabase Storage
         try {
@@ -25,7 +26,7 @@ exports.createAccount = async (req, res) => {
             if (error) {
                 console.error('Error uploading file to Supabase Storage:', error);
                 // Provide a more informative error message
-                if (error.message && error.message.includes('new row violates row-level security policy')) {
+                if (error.message && (error.message.includes('new row violates row-level security policy') || error.message.includes('Bucket not found'))) {
                     return res.status(500).json({ 
                         success: false, 
                         message: 'Storage bucket not configured properly. Please check Supabase Storage setup instructions in README_SUPABASE_SETUP.txt' 
@@ -49,10 +50,9 @@ exports.createAccount = async (req, res) => {
             console.error('Error reading file for Supabase upload:', fileReadError);
             imagePath = 'images/default.png';
         }
-    } else if (req.body.image === 'images/default.png') {
-        // Explicitly set default image when no file is uploaded
-        imagePath = 'images/default.png';
-    }
+    } 
+    // If no file was uploaded, use the default image path that was sent from frontend
+    // This handles the case where req.body.image === 'images/default.png'
 
     // Log the image path for debugging
     console.log('/accounts: Image path being stored:', imagePath);
@@ -154,7 +154,7 @@ exports.updateAccount = async (req, res) => {
             if (error) {
                 console.error('Error uploading file to Supabase Storage:', error);
                 // Provide a more informative error message
-                if (error.message && error.message.includes('new row violates row-level security policy')) {
+                if (error.message && (error.message.includes('new row violates row-level security policy') || error.message.includes('Bucket not found'))) {
                     return res.status(500).json({ 
                         success: false, 
                         message: 'Storage bucket not configured properly. Please check Supabase Storage setup instructions in README_SUPABASE_SETUP.txt' 
@@ -212,7 +212,7 @@ exports.updateAccount = async (req, res) => {
         return res.status(404).json({ success: false, message: 'Account not found or you do not have permission to update it.' });
     }
 
-    res.json({ success: true, message: 'Account updated successfully!', image: imagePath });
+    res.json({ success: true, message: 'Account updated successfully!' });
 };
 
 exports.deleteAccount = async (req, res) => {

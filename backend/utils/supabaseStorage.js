@@ -35,6 +35,10 @@ async function uploadFileToSupabase(fileBuffer, fileName, bucketName = 'images')
     return { publicUrl, error: null };
   } catch (err) {
     console.error('Unexpected error uploading file to Supabase Storage:', err);
+    // Improve error message for bucket not found
+    if (err && err.message && err.message.includes('Bucket not found')) {
+      return { publicUrl: null, error: new Error(`Bucket not found: ${bucketName}. Please create the bucket in your Supabase Storage.`) };
+    }
     return { publicUrl: null, error: err };
   }
 }
