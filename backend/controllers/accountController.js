@@ -128,22 +128,32 @@ exports.updateAccount = async (req, res) => {
         return res.status(400).json({ success: false, message: 'Site, username, and password are required.' });
     }
 
-    let imagePath = req.body.currentImage || 'https://nttadnyxpbuwuhgtpvjh.supabase.co/storage/v1/object/public/images/default.png';
+    // First, get the current account data to retrieve the existing image URL
+    const { data: currentAccountData, error: fetchError } = await supabase
+        .from('accounts')
+        .select('image')
+        .eq('id', accountId)
+        .eq('user_id', userId);
+
+    if (fetchError) {
+        console.error(fetchError);
+        return res.status(500).json({ success: false, message: 'Error fetching current account data.' });
+    }
+
+    // Check if account exists
+    if (!currentAccountData || currentAccountData.length === 0) {
+        return res.status(404).json({ success: false, message: 'Account not found or you do not have permission to update it.' });
+    }
+
+    const currentImage = currentAccountData[0].image;
+    let imagePath = currentImage || 'https://nttadnyxpbuwuhgtpvjh.supabase.co/storage/v1/object/public/images/default.png';
+    
     if (req.file) {
         // Upload new file to Supabase Storage
         try {
             // Read the file buffer directly from the uploaded file
             const fileBuffer = req.file.buffer || fs.readFileSync(req.file.path);
             const fileName = `accounts/${req.file.filename}`;
-            
-            // If there was a previous image, try to delete it from Supabase Storage
-            if (imagePath && imagePath.startsWith('http')) {
-                // Extract the file name from the URL
-                const urlParts = imagePath.split('/');
-                const oldFileName = urlParts[urlParts.length - 1];
-                const oldFilePath = `accounts/${oldFileName}`;
-                await deleteFileFromSupabase(oldFilePath, 'images');
-            }
             
             const { publicUrl, error } = await uploadFileToSupabase(fileBuffer, fileName);
             
@@ -156,6 +166,26 @@ exports.updateAccount = async (req, res) => {
                 });
             } else {
                 imagePath = publicUrl;
+                
+                // If there was a previous image stored in Supabase Storage, delete it
+                if (currentImage && currentImage.startsWith('http') && currentImage.includes('supabase.co/storage')) {
+                    try {
+                        // Extract the file name from the URL
+                        const urlParts = currentImage.split('/');
+                        const oldFileName = urlParts[urlParts.length - 1];
+                        const oldFilePath = `accounts/${oldFileName}`;
+                        console.log(`Deleting old image file: ${oldFilePath}`);
+                        const { error: deleteError } = await deleteFileFromSupabase(oldFilePath, 'images');
+                        
+                        if (deleteError) {
+                            console.error('Error deleting old image from Supabase Storage:', deleteError);
+                        } else {
+                            console.log('Old image deleted successfully from Supabase Storage');
+                        }
+                    } catch (deleteErr) {
+                        console.error('Error deleting old image file:', deleteErr);
+                    }
+                }
             }
             
             // Clean up local file if it exists
@@ -172,6 +202,26 @@ exports.updateAccount = async (req, res) => {
     } else if (req.body.image === 'images/default.png') {
         // If user explicitly selected default image, use it
         imagePath = 'https://nttadnyxpbuwuhgtpvjh.supabase.co/storage/v1/object/public/images/default.png';
+        
+        // If there was a previous image stored in Supabase Storage, delete it
+        if (currentImage && currentImage.startsWith('http') && currentImage.includes('supabase.co/storage')) {
+            try {
+                // Extract the file name from the URL
+                const urlParts = currentImage.split('/');
+                const oldFileName = urlParts[urlParts.length - 1];
+                const oldFilePath = `accounts/${oldFileName}`;
+                console.log(`Deleting old image file: ${oldFilePath}`);
+                const { error: deleteError } = await deleteFileFromSupabase(oldFilePath, 'images');
+                
+                if (deleteError) {
+                    console.error('Error deleting old image from Supabase Storage:', deleteError);
+                } else {
+                    console.log('Old image deleted successfully from Supabase Storage');
+                }
+            } catch (deleteErr) {
+                console.error('Error deleting old image file:', deleteErr);
+            }
+        }
     }
 
     // Log the image path for debugging
@@ -212,6 +262,26 @@ exports.deleteAccount = async (req, res) => {
     const accountId = req.params.id;
     const userId = req.user.id;
 
+    // First, get the account to retrieve the image URL
+    const { data: accountData, error: fetchError } = await supabase
+        .from('accounts')
+        .select('image')
+        .eq('id', accountId)
+        .eq('user_id', userId);
+
+    if (fetchError) {
+        console.error(fetchError);
+        return res.status(500).json({ success: false, message: 'Error fetching account for deletion.' });
+    }
+
+    // Check if account exists
+    if (!accountData || accountData.length === 0) {
+        return res.status(404).json({ success: false, message: 'Account not found or you do not have permission to delete it.' });
+    }
+
+    const accountImage = accountData[0].image;
+
+    // Delete the account
     const { data, error } = await supabase
         .from('accounts')
         .delete()
@@ -226,6 +296,27 @@ exports.deleteAccount = async (req, res) => {
     // Check if no rows were affected (account not found or not owned by user)
     if (data && data.length === 0) {
         return res.status(404).json({ success: false, message: 'Account not found or you do not have permission to delete it.' });
+    }
+
+    // If the account had an image stored in Supabase Storage, delete it
+    if (accountImage && accountImage.startsWith('http') && accountImage.includes('supabase.co/storage')) {
+        try {
+            // Extract the file name from the URL
+            const urlParts = accountImage.split('/');
+            const fileName = urlParts[urlParts.length - 1];
+            const filePath = `accounts/${fileName}`;
+            
+            console.log(`Deleting image file: ${filePath}`);
+            const { error: deleteError } = await deleteFileFromSupabase(filePath, 'images');
+            
+            if (deleteError) {
+                console.error('Error deleting image from Supabase Storage:', deleteError);
+            } else {
+                console.log('Image deleted successfully from Supabase Storage');
+            }
+        } catch (deleteErr) {
+            console.error('Error deleting image file:', deleteErr);
+        }
     }
 
     res.json({ success: true, message: 'Account deleted successfully!' });
