@@ -75,7 +75,7 @@ exports.createAccount = async (req, res) => {
         // If there was an error and we uploaded a file, try to delete it from Supabase
         if (req.file && imagePath.startsWith('http')) {
             const fileName = `accounts/${req.file.filename}`;
-            await deleteFileFromSupabase(fileName);
+            await deleteFileFromSupabase(fileName, 'images');
         }
         return res.status(500).json({ success: false, message: 'Error creating account.' });
     }
@@ -146,7 +146,7 @@ exports.updateAccount = async (req, res) => {
                 const urlParts = imagePath.split('/');
                 const oldFileName = urlParts[urlParts.length - 1];
                 const oldFilePath = `accounts/${oldFileName}`;
-                await deleteFileFromSupabase(oldFilePath);
+                await deleteFileFromSupabase(oldFilePath, 'images');
             }
             
             const { publicUrl, error } = await uploadFileToSupabase(fileBuffer, fileName);
@@ -207,7 +207,7 @@ exports.updateAccount = async (req, res) => {
             const urlParts = imagePath.split('/');
             const fileName = urlParts[urlParts.length - 1];
             const filePath = `accounts/${fileName}`;
-            await deleteFileFromSupabase(filePath);
+            await deleteFileFromSupabase(filePath, 'images');
         }
         return res.status(404).json({ success: false, message: 'Account not found or you do not have permission to update it.' });
     }
