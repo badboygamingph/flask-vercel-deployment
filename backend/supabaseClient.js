@@ -39,7 +39,5 @@ async function initializeTables() {
   }
 }
 
-// Call initializeTables to show the table structures
-initializeTables();
-
-module.exports = supabase;
+// Export initializeTables function for manual calling if needed
+module.exports = { supabase, initializeTables };
