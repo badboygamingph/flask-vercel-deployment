@@ -11,6 +11,20 @@ async function uploadFileToSupabase(fileBuffer, fileName, bucketName = 'images')
   try {
     console.log(`Uploading file to Supabase Storage: ${fileName} in bucket: ${bucketName}`);
     
+    // First, check if the bucket exists
+    const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+    
+    if (listError) {
+      console.error('Error listing buckets:', listError);
+      return { publicUrl: null, error: new Error('Failed to access Supabase Storage. Please check your Supabase configuration.') };
+    }
+    
+    // Check if the specified bucket exists
+    const bucketExists = buckets && buckets.some(bucket => bucket.name === bucketName);
+    if (!bucketExists) {
+      return { publicUrl: null, error: new Error(`Bucket "${bucketName}" not found. Please create the bucket in your Supabase Storage dashboard.`) };
+    }
+    
     // Upload the file to Supabase Storage
     const { data, error } = await supabase.storage
       .from(bucketName)
@@ -35,10 +49,6 @@ async function uploadFileToSupabase(fileBuffer, fileName, bucketName = 'images')
     return { publicUrl, error: null };
   } catch (err) {
     console.error('Unexpected error uploading file to Supabase Storage:', err);
-    // Improve error message for bucket not found
-    if (err && err.message && err.message.includes('Bucket not found')) {
-      return { publicUrl: null, error: new Error(`Bucket not found: ${bucketName}. Please create the bucket in your Supabase Storage.`) };
-    }
     return { publicUrl: null, error: err };
   }
 }

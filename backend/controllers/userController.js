@@ -85,10 +85,10 @@ exports.uploadProfilePicture = async (req, res) => {
         if (error) {
             console.error('Error uploading profile picture to Supabase Storage:', error);
             // Provide a more informative error message
-            if (error.message && (error.message.includes('new row violates row-level security policy') || error.message.includes('Bucket not found'))) {
+            if (error.message && (error.message.includes('new row violates row-level security policy') || error.message.includes('Bucket not found') || error.message.includes('bucket in your Supabase Storage dashboard'))) {
                 return res.status(500).json({ 
                     success: false, 
-                    message: 'Storage bucket not configured properly. Please check Supabase Storage setup instructions in README_SUPABASE_SETUP.txt' 
+                    message: error.message
                 });
             }
             // Fall back to default image if upload fails
