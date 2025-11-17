@@ -275,15 +275,41 @@ $(document).ready(function() {
                 data: 'image',
                 render: function(data, type, row) {
                     // Use BASE_URL for default images to avoid mixed content issues
-                    const imageUrl = data ? `${BASE_URL}/${data}` : `${BASE_URL}/images/default.png`;
+                    // Ensure we're using the correct path format
+                    let imageUrl;
+                    if (data) {
+                        // If data already includes BASE_URL, don't add it again
+                        if (data.startsWith('http')) {
+                            imageUrl = data;
+                        } else {
+                            // Otherwise, construct the full URL
+                            imageUrl = `${BASE_URL}/${data}`;
+                        }
+                    } else {
+                        imageUrl = `${BASE_URL}/images/default.png`;
+                    }
                     return `<img src="${imageUrl}" alt="Account Image" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">`;
                 }
             },
             {
                 data: null,
                 render: function(data, type, row) {
+                    // Ensure we're using the correct path format for the edit button
+                    let imageAttribute;
+                    if (row.image) {
+                        // If data already includes BASE_URL, don't add it again
+                        if (row.image.startsWith('http')) {
+                            imageAttribute = row.image;
+                        } else {
+                            // Otherwise, construct the full URL
+                            imageAttribute = `${BASE_URL}/${row.image}`;
+                        }
+                    } else {
+                        imageAttribute = `${BASE_URL}/images/default.png`;
+                    }
+                    
                     return `
-                        <button class="btn btn-sm btn-info edit-btn" data-id="${row.id}" data-site="${row.site}" data-username="${row.username}" data-password="${row.password}" data-image="${row.image ? `${BASE_URL}/${row.image}` : `${BASE_URL}/images/default.png`}" data-bs-toggle="modal" data-bs-target="#editAccountModal">Edit</button>
+                        <button class="btn btn-sm btn-info edit-btn" data-id="${row.id}" data-site="${row.site}" data-username="${row.username}" data-password="${row.password}" data-image="${imageAttribute}" data-bs-toggle="modal" data-bs-target="#editAccountModal">Edit</button>
                         <button class="btn btn-sm btn-danger delete-btn" data-id="${row.id}" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Delete</button>
                     `;
                 }
@@ -340,14 +366,20 @@ $(document).ready(function() {
         const username = $(this).data('username');
         const password = $(this).data('password');
         const image = $(this).data('image');
+        
+        // Strip BASE_URL prefix if present to get the relative path
+        let relativeImagePath = image;
+        if (image && image.startsWith(BASE_URL)) {
+            relativeImagePath = image.substring(BASE_URL.length + 1); // +1 for the trailing slash
+        }
 
         $('#editAccountId').val(id);
         $('#editSite').val(site);
         $('#editUsername').val(username);
         $('#editPassword').val(password);
-        $('#currentAccountImage').attr('src', image ? `${BASE_URL}/${image}` : `${BASE_URL}/images/default.png`).show();
-        // Store the current image path in a hidden field
-        $('#editAccountForm').data('currentImage', image);
+        $('#currentAccountImage').attr('src', image ? `${BASE_URL}/${relativeImagePath}` : `${BASE_URL}/images/default.png`).show();
+        // Store the current image path in a hidden field (relative path, not full URL)
+        $('#editAccountForm').data('currentImage', relativeImagePath);
     });
 
     $('#editAccountForm').on('submit', function(event) {
