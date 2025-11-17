@@ -503,7 +503,7 @@ $(document).ready(function() {
         if (data && data.success && data.profilepicture) {
             $('#userProfilePicture').attr('src', data.profilepicture);
         } else {
-            $('#userProfilePicture').attr('src', 'images/default-profile.png');
+            $('#userProfilePicture').attr('src', `${BASE_URL}/images/default-profile.png`);
         }
     };
     loadUserProfilePicture();
