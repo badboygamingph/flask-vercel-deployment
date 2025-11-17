@@ -80,12 +80,12 @@ exports.uploadProfilePicture = async (req, res) => {
         const fileBuffer = req.file.buffer || fs.readFileSync(req.file.path);
         const fileName = `profile-pictures/${req.file.filename}`;
         
-        const { publicUrl, error } = await uploadFileToSupabase(fileBuffer, fileName);
+        const { publicUrl, error } = await uploadFileToSupabase(fileBuffer, fileName, 'images'); // Use 'images' bucket
         
         if (error) {
             console.error('Error uploading profile picture to Supabase Storage:', error);
             // Provide a more informative error message
-            if (error.message && error.message.includes('new row violates row-level security policy')) {
+            if (error.message && (error.message.includes('new row violates row-level security policy') || error.message.includes('Bucket not found'))) {
                 return res.status(500).json({ 
                     success: false, 
                     message: 'Storage bucket not configured properly. Please check Supabase Storage setup instructions in README_SUPABASE_SETUP.txt' 
@@ -122,7 +122,7 @@ exports.uploadProfilePicture = async (req, res) => {
             const urlParts = profilepicturePath.split('/');
             const fileName = urlParts[urlParts.length - 1];
             const filePath = `profile-pictures/${fileName}`;
-            await deleteFileFromSupabase(filePath);
+            await deleteFileFromSupabase(filePath, 'images'); // Use 'images' bucket
         }
         return res.status(500).json({ success: false, message: 'Error saving profile picture.' });
     }
@@ -134,7 +134,7 @@ exports.uploadProfilePicture = async (req, res) => {
             const urlParts = profilepicturePath.split('/');
             const fileName = urlParts[urlParts.length - 1];
             const filePath = `profile-pictures/${fileName}`;
-            await deleteFileFromSupabase(filePath);
+            await deleteFileFromSupabase(filePath, 'images'); // Use 'images' bucket
         }
         return res.status(404).json({ success: false, message: 'User not found or you do not have permission to update profile picture.' });
     }
@@ -166,6 +166,7 @@ exports.getProfilePicture = async (req, res) => {
         // For Supabase Storage URLs, return as-is since they're already full URLs
         // For local images, return relative path
         if (profilepicture && !profilepicture.startsWith('http')) {
+            // Ensure the path is properly formatted
             profilepicture = profilepicture.replace(/\\/g, '/');
         }
         res.json({ success: true, profilepicture: profilepicture });
