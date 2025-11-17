@@ -9,7 +9,7 @@ exports.getUserInfo = async (req, res) => {
 
     const { data: users, error } = await supabase
         .from('users')
-        .select('id, firstname, middlename, lastname, email, profilepicture')
+        .select('id, firstname, middlename, lastname, email, profilePicture')
         .eq('id', userId);
 
     if (error) {
@@ -19,8 +19,8 @@ exports.getUserInfo = async (req, res) => {
 
     if (users.length > 0) {
         const user = users[0];
-        if (user.profilepicture && !user.profilepicture.startsWith('http')) {
-            user.profilepicture = `${BASE_URL}/${user.profilepicture.replace(/\\/g, '/')}`;
+        if (user.profilePicture && !user.profilePicture.startsWith('http')) {
+            user.profilePicture = `${BASE_URL}/${user.profilePicture.replace(/\\/g, '/')}`;
         }
         res.json({ success: true, user: user });
     } else {
@@ -67,7 +67,7 @@ exports.uploadProfilePicture = async (req, res) => {
 
     const { data, error } = await supabase
         .from('users')
-        .update({ profilepicture: profilepicturePath })
+        .update({ profilePicture: profilepicturePath })
         .eq('id', userId);
 
     if (error) {
@@ -94,7 +94,7 @@ exports.getProfilePicture = async (req, res) => {
 
     const { data: users, error } = await supabase
         .from('users')
-        .select('profilepicture')
+        .select('profilePicture')
         .eq('id', userId);
 
     if (error) {
@@ -103,7 +103,7 @@ exports.getProfilePicture = async (req, res) => {
     }
 
     if (users.length > 0) {
-        let profilepicture = users[0].profilepicture;
+        let profilepicture = users[0].profilePicture;
         if (profilepicture && !profilepicture.startsWith('http')) {
             profilepicture = `${BASE_URL}/${profilepicture.replace(/\\/g, '/')}`;
         }
