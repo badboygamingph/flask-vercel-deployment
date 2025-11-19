@@ -37,6 +37,15 @@ def index():
 def dashboard():
     return send_from_directory('../frontend', 'dashboard.html')
 
+# Serve all frontend static files
+@app.route('/<path:filename>')
+def frontend_files(filename):
+    try:
+        return send_from_directory('../frontend', filename)
+    except FileNotFoundError:
+        # If file not found, return 404
+        return jsonify({'success': False, 'message': 'File not found'}), 404
+
 # Serve images from the frontend/images directory
 @app.route('/images/<path:filename>')
 def images(filename):
