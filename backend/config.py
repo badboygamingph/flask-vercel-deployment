@@ -20,3 +20,6 @@ class Config:
     EMAIL_PORT = int(os.environ.get('EMAIL_PORT') or 587)
     EMAIL_USER = os.environ.get('EMAIL_USER') or 'your_email@gmail.com'
     EMAIL_PASS = os.environ.get('EMAIL_PASS') or 'your_app_password'
+    
+    # Debug mode
+    DEBUG = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'

@@ -18,15 +18,27 @@ from middleware.auth import authenticate_token
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# Enable CORS
-CORS(app, supports_credentials=True)
+# Enable CORS with specific origins for development and production
+CORS(app, 
+     origins=[
+         "http://127.0.0.1:5500",  # Local development server
+         "http://localhost:5500",   # Alternative local development server
+         "https://flask-vercel-deployment-amber.vercel.app"  # Production
+     ],
+     supports_credentials=True,
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+     allow_headers=["Content-Type", "Authorization"])
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize Supabase client
-supabase = get_supabase_client()
+try:
+    supabase = get_supabase_client()
+except Exception as e:
+    logger.error(f"Failed to initialize Supabase client: {str(e)}")
+    supabase = None
 
 # Serve static files from the frontend directory
 @app.route('/')
@@ -49,7 +61,11 @@ def frontend_files(filename):
 # Serve images from the frontend/images directory
 @app.route('/images/<path:filename>')
 def images(filename):
-    return send_from_directory('../frontend/images', filename)
+    try:
+        return send_from_directory('../frontend/images', filename)
+    except FileNotFoundError:
+        # If file not found, return 404
+        return jsonify({'success': False, 'message': 'Image not found'}), 404
 
 # Import and register blueprints
 from routes import auth_bp, user_bp, account_bp, item_bp
@@ -58,45 +74,6 @@ app.register_blueprint(user_bp)
 app.register_blueprint(account_bp)
 app.register_blueprint(item_bp)
 
-# Vercel serverless function handler
-def handler(request, context):
-    from werkzeug.wrappers import Response
-    from werkzeug.urls import url_parse
-    
-    # Create a WSGI environment from the request
-    environ = {
-        'REQUEST_METHOD': request.method,
-        'PATH_INFO': request.path,
-        'QUERY_STRING': request.query_string.decode('utf-8') if request.query_string else '',
-        'CONTENT_TYPE': request.headers.get('Content-Type', ''),
-        'CONTENT_LENGTH': str(len(request.body)) if request.body else '0',
-        'SERVER_NAME': 'localhost',
-        'SERVER_PORT': '80',
-        'SERVER_PROTOCOL': 'HTTP/1.1',
-        'wsgi.version': (1, 0),
-        'wsgi.url_scheme': 'http',
-        'wsgi.input': request.body if request.body else b'',
-        'wsgi.errors': sys.stderr,
-        'wsgi.multithread': False,
-        'wsgi.multiprocess': False,
-        'wsgi.run_once': False,
-        'wsgi.async': False,
-    }
-    
-    # Add headers
-    for header_name, header_value in request.headers.items():
-        environ[f'HTTP_{header_name.upper().replace("-", "_")}'] = header_value
-    
-    # Create a response
-    response = Response.from_app(app, environ)
-    
-    # Return the response in Vercel format
-    return {
-        'statusCode': response.status_code,
-        'headers': dict(response.headers),
-        'body': response.get_data(as_text=True)
-    }
-
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+# For Vercel serverless deployment
+if __name__ != '__main__':
+    app.logger.setLevel(logging.INFO)

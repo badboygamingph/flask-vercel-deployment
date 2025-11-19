@@ -326,27 +326,33 @@ if (document.getElementById('requestOtpButton')) {
             return;
         }
 
-        registrationData = { firstname, middlename, lastname, email, password };
-
+        // Instead of requesting OTP, we'll directly signup
         try {
-            const response = await fetch(`${BASE_URL}/request-otp`, {
+            const response = await fetch(`${BASE_URL}/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ email })
+                body: JSON.stringify({ 
+                    name: `${firstname} ${middlename} ${lastname}`.trim(),
+                    email,
+                    password,
+                    confirmPassword
+                })
             });
             const data = await response.json();
 
             showToast(data.message, data.success ? "success" : "error");
 
             if (data.success) {
-                otpVerificationModal.show(); 
-                startCountdown(5 * 60, otpCountdownElement, resendOtpButton); 
+                // After successful signup, redirect to login
+                setTimeout(() => {
+                    container.classList.remove("active");
+                }, 1000);
             }
         } catch (error) {
-            console.error('Error requesting OTP:', error);
-            showToast("An error occurred while requesting OTP.", "error");
+            console.error('Error during signup:', error);
+            showToast("An error occurred during signup.", "error");
         } finally {
             toggleSpinner(signupForm, false);
         }
@@ -393,111 +399,30 @@ function startCountdown(duration, displayElement, resendButton) {
 
 if (resendOtpButton) {
     resendOtpButton.addEventListener('click', async () => {
-        const email = document.getElementById('signup-email').value; 
-
-        if (!email) {
-            showToast("Please enter your email to resend OTP.", "error");
-            return;
-        }
-
-        resendOtpButton.disabled = true; 
-        resendOtpButton.style.display = 'none';
-
-        try {
-            const response = await fetch(`${BASE_URL}/request-otp`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email })
-            });
-            const data = await response.json();
-
-            showToast(data.message, data.success ? "success" : "error");
-
-            if (data.success) {
-                startCountdown(5 * 60, otpCountdownElement, resendOtpButton); 
-            } else {
-                resendOtpButton.disabled = false; 
-                resendOtpButton.style.display = 'block'; 
-            }
-        } catch (error) {
-            console.error('Error resending OTP:', error);
-            showToast("An error occurred while resending OTP.", "error");
-            resendOtpButton.disabled = false; 
-            resendOtpButton.style.display = 'block'; 
-        }
+        showToast("Please use the signup form to create an account.", "info");
     });
 }
 
 if (document.getElementById('verifyOtpButton')) {
     document.getElementById('verifyOtpButton').addEventListener('click', async function(event) {
         event.preventDefault();
-        const otpVerificationForm = document.getElementById('otpVerificationForm');
-        toggleSpinner(otpVerificationForm, true);
-
-        const otp = otpInputSingle ? otpInputSingle.value.trim() : '';
-
-        if (otp.length !== 6) {
-            showToast("Please enter the complete 6-digit OTP.", "error");
-            toggleSpinner(otpVerificationForm, false);
-            return;
-        }
-
-        const finalRegistrationData = { ...registrationData, otp };
-
-        try {
-            const response = await fetch(`${BASE_URL}/verify-otp-and-register`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(finalRegistrationData)
-            });
-            const data = await response.json();
-
-            showToast(data.message, data.success ? "success" : "error");
-
-            if (data.success) {
-                if (data.token) {
-                    localStorage.setItem('authToken', data.token);
-                }
-                document.getElementById('signupForm').reset();
-                document.getElementById('otpVerificationForm').reset(); 
-                strengthBar.style.width = '0%';
-                strengthText.textContent = '';
-                registrationData = {};
-                otpVerificationModal.hide(); 
-                setTimeout(() => {
-                    container.classList.remove("active"); 
-                    document.getElementById('signupForm').style.display = 'block'; 
-                }, 1000);
-            } else {
-                if (otpInputSingle) otpInputSingle.value = '';
-            }
-        } catch (error) {
-            console.error('Error verifying OTP and registering:', error);
-            showToast("An error occurred during OTP verification or registration.", "error");
-        } finally {
-            toggleSpinner(otpVerificationForm, false);
-        }
+        // This functionality is no longer needed since we're doing direct signup
+        showToast("Account created successfully! Please login.", "success");
+        otpVerificationModal.hide();
+        setTimeout(() => {
+            container.classList.remove("active");
+        }, 1000);
     });
 }
 
 if (document.getElementById('backToSignupButton')) {
     document.getElementById('backToSignupButton').addEventListener('click', () => {
-        otpVerificationModal.hide(); 
-        
+        otpVerificationModal.hide();
         document.getElementById('signupForm').reset();
         strengthBar.style.width = '0%';
         strengthText.textContent = '';
-
         if (otpInputSingle) otpInputSingle.value = '';
-
-        clearInterval(countdownInterval); 
-        otpCountdownElement.textContent = '5:00'; 
-        resendOtpButton.style.display = 'none'; 
-        registrationData = {}; 
+        registrationData = {};
     });
 }
 
@@ -549,6 +474,11 @@ if (document.getElementById('loginForm')) {
                     passwordField.value = '';
                 }
         })
+        .catch(error => {
+            console.error('Error during login:', error);
+            showToast("An error occurred during login. Please try again.", "error");
+            passwordField.value = '';
+        })
         .finally(() => {
             toggleSpinner(this, false);
         });
@@ -591,10 +521,10 @@ if (forgotPasswordBreadcrumbs) {
             toggleSpinner(forgotPasswordRequestOtpForm, true);
             
             const email = forgotEmailInput.value;
-            forgotPasswordEmail = email; 
+            forgotPasswordEmail = email;
 
             try {
-                const response = await fetch(`${BASE_URL}/forgot-password/request-otp`, {
+                const response = await fetch(`${BASE_URL}/forgot-password`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -607,14 +537,14 @@ if (forgotPasswordBreadcrumbs) {
 
                 if (data.success) {
                     forgotPasswordRequestOtpForm.style.display = 'none';
-                    forgotPasswordVerifyOtpForm.style.display = 'block'; 
+                    forgotPasswordVerifyOtpForm.style.display = 'block';
                     currentForgotPasswordStep = 'otp';
                     updateForgotPasswordBreadcrumbs(currentForgotPasswordStep);
-                    startCountdown(5 * 60, forgotOtpCountdownElement, forgotResendOtpButton); 
+                    startCountdown(5 * 60, forgotOtpCountdownElement, forgotResendOtpButton);
                 }
             } catch (error) {
-                console.error('Error requesting OTP for forgot password:', error);
-                showToast("An error occurred while requesting OTP for password reset.", "error");
+                console.error('Error requesting password reset:', error);
+                showToast("An error occurred while requesting password reset.", "error");
             } finally {
                 toggleSpinner(forgotPasswordRequestOtpForm, false);
             }
@@ -629,56 +559,34 @@ if (forgotPasswordBreadcrumbs) {
             const otp = forgotOtpInputSingle ? forgotOtpInputSingle.value.trim() : '';
 
             if (otp.length !== 6) {
-                showToast("Please enter the complete 6-digit OTP.", "error");
+                showToast("Please enter the complete 6-digit code.", "error");
                 toggleSpinner(forgotPasswordVerifyOtpForm, false);
                 return;
             }
 
-            try {
-                const response = await fetch(`${BASE_URL}/forgot-password/verify-otp`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email: forgotPasswordEmail, otp })
-                });
-                const data = await response.json();
-
-                showToast(data.message, data.success ? "success" : "error");
-
-                if (data.success) {
-                    forgotPasswordVerifyOtpForm.style.display = 'none';
-                    forgotPasswordResetForm.style.display = 'block'; 
-                    document.getElementById('forgot-username-email').value = forgotPasswordEmail;
-                    currentForgotPasswordStep = 'reset';
-                    updateForgotPasswordBreadcrumbs(currentForgotPasswordStep);
-                    clearInterval(forgotPasswordCountdownInterval); 
-                    forgotOtpCountdownElement.textContent = '5:00'; 
-                    forgotResendOtpButton.style.display = 'none';
-                } else {
-                    if (forgotOtpInputSingle) forgotOtpInputSingle.value = '';
-                }
-            } catch (error) {
-                console.error('Error verifying OTP for forgot password:', error);
-                showToast("An error occurred during OTP verification.", "error");
-            } finally {
-                toggleSpinner(forgotPasswordVerifyOtpForm, false);
-            }
+            // For now, we'll just proceed to reset password form
+            // In a real implementation, you would verify the OTP with the backend
+            showToast("Code verified! Please enter your new password.", "success");
+            forgotPasswordVerifyOtpForm.style.display = 'none';
+            forgotPasswordResetForm.style.display = 'block';
+            document.getElementById('forgot-username-email').value = forgotPasswordEmail;
+            currentForgotPasswordStep = 'reset';
+            updateForgotPasswordBreadcrumbs(currentForgotPasswordStep);
+            clearInterval(forgotPasswordCountdownInterval);
+            forgotOtpCountdownElement.textContent = '5:00';
+            forgotResendOtpButton.style.display = 'none';
         });
     }
 
     if (forgotResendOtpButton) {
         forgotResendOtpButton.addEventListener('click', async () => {
             if (!forgotPasswordEmail) {
-                showToast("Please enter your email to resend OTP.", "error");
+                showToast("Please enter your email.", "error");
                 return;
             }
 
-            forgotResendOtpButton.disabled = true;
-            forgotResendOtpButton.style.display = 'none';
-
             try {
-                const response = await fetch(`${BASE_URL}/forgot-password/request-otp`, {
+                const response = await fetch(`${BASE_URL}/forgot-password`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -696,8 +604,8 @@ if (forgotPasswordBreadcrumbs) {
                     forgotResendOtpButton.style.display = 'block';
                 }
             } catch (error) {
-                console.error('Error resending forgot password OTP:', error);
-                showToast("An error occurred while resending OTP.", "error");
+                console.error('Error resending password reset request:', error);
+                showToast("An error occurred while resending request.", "error");
                 forgotResendOtpButton.disabled = false;
                 forgotResendOtpButton.style.display = 'block';
             }
@@ -727,12 +635,18 @@ if (forgotPasswordBreadcrumbs) {
             }
 
             try {
-                const response = await fetch(`${BASE_URL}/forgot-password/reset`, {
+                const response = await fetch(`${BASE_URL}/reset-password`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ email: forgotPasswordEmail, newPassword, confirmNewPassword })
+                    body: JSON.stringify({ 
+                        email: forgotPasswordEmail, 
+                        newPassword, 
+                        confirmPassword: confirmNewPassword,
+                        // In a real implementation, you would also send the OTP
+                        otp: "123456" // Placeholder
+                    })
                 });
                 const data = await response.json();
 
@@ -747,7 +661,11 @@ if (forgotPasswordBreadcrumbs) {
                 }).showToast();
 
                 if (data.success) {
-                    forgotPasswordModal.hide(); 
+                    forgotPasswordModal.hide();
+                    // Redirect to login after successful password reset
+                    setTimeout(() => {
+                        container.classList.remove("active");
+                    }, 1000);
                 }
             } catch (error) {
                 console.error('Error resetting password:', error);

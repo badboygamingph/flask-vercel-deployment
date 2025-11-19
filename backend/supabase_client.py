@@ -22,6 +22,7 @@ def get_supabase_client() -> Client:
     if not supabase_url or not supabase_key:
         logger.warning("Supabase credentials not found in environment variables")
         logger.warning("Make sure to set SUPABASE_URL and SUPABASE_KEY in your environment variables")
+        return None
     
     try:
         logger.info("Creating Supabase client with URL and Key")
@@ -30,8 +31,12 @@ def get_supabase_client() -> Client:
         return supabase
     except Exception as error:
         logger.error(f"Error creating Supabase client: {str(error)}")
-        # Return None or raise exception based on your error handling strategy
-        raise error
+        # Return None to prevent crashing the application
+        return None
 
 # Create a global instance
-supabase = get_supabase_client()
+try:
+    supabase = get_supabase_client()
+except Exception as e:
+    logger.error(f"Failed to create Supabase client instance: {str(e)}")
+    supabase = None

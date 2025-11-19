@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "backend/flask_app.py",
+      "src": "backend/vercel_wrapper.py",
       "use": "@vercel/python",
       "config": {
         "runtime": "python3.9",
@@ -13,11 +13,11 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/flask_app.py"
+      "dest": "backend/vercel_wrapper.py"
     },
     {
       "src": "/(.*)",
-      "dest": "backend/flask_app.py"
+      "dest": "backend/vercel_wrapper.py"
     }
   ]
 }
