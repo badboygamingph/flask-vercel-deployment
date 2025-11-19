@@ -49,6 +49,45 @@ app.register_blueprint(user_bp)
 app.register_blueprint(account_bp)
 app.register_blueprint(item_bp)
 
+# Vercel serverless function handler
+def handler(request, context):
+    from werkzeug.wrappers import Response
+    from werkzeug.urls import url_parse
+    
+    # Create a WSGI environment from the request
+    environ = {
+        'REQUEST_METHOD': request.method,
+        'PATH_INFO': request.path,
+        'QUERY_STRING': request.query_string.decode('utf-8') if request.query_string else '',
+        'CONTENT_TYPE': request.headers.get('Content-Type', ''),
+        'CONTENT_LENGTH': str(len(request.body)) if request.body else '0',
+        'SERVER_NAME': 'localhost',
+        'SERVER_PORT': '80',
+        'SERVER_PROTOCOL': 'HTTP/1.1',
+        'wsgi.version': (1, 0),
+        'wsgi.url_scheme': 'http',
+        'wsgi.input': request.body if request.body else b'',
+        'wsgi.errors': sys.stderr,
+        'wsgi.multithread': False,
+        'wsgi.multiprocess': False,
+        'wsgi.run_once': False,
+        'wsgi.async': False,
+    }
+    
+    # Add headers
+    for header_name, header_value in request.headers.items():
+        environ[f'HTTP_{header_name.upper().replace("-", "_")}'] = header_value
+    
+    # Create a response
+    response = Response.from_app(app, environ)
+    
+    # Return the response in Vercel format
+    return {
+        'statusCode': response.status_code,
+        'headers': dict(response.headers),
+        'body': response.get_data(as_text=True)
+    }
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
